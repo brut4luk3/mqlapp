@@ -2,39 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'company_details.dart';
-import 'company_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  final String fullName;
+class CompanyScreen extends StatefulWidget {
   final int userId;
 
-  HomeScreen({required this.fullName, required this.userId});
+  CompanyScreen({required this.userId});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _CompanyScreenState createState() => _CompanyScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _CompanyScreenState extends State<CompanyScreen> {
   List<CompanyData> companyDataList = [];
 
   @override
   void initState() {
     super.initState();
-    fetchCompanies();
+    fetchUserCompanies();
   }
 
-  Future<void> fetchCompanies() async {
-    final String apiUrl = 'https://mqlapp.onrender.com/api/get_companies';
+  Future<void> fetchUserCompanies() async {
+    final String apiUrl = 'https://mqlapp.onrender.com/api/get_user_companies';
 
-    final http.Response response = await http.get(Uri.parse(apiUrl));
+    final Map<String, dynamic> data = {
+      'user_id': widget.userId,
+    };
+
+    final http.Response response = await http.post(
+      Uri.parse(apiUrl),
+      body: jsonEncode(data),
+      headers: {'Content-Type': 'application/json'},
+    );
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-      final List<dynamic> companies = responseData['company_data'];
 
-      setState(() {
-        companyDataList = companies.map((data) => CompanyData.fromJson(data)).toList();
-      });
+      if (responseData.containsKey('company_data')) {
+        final List<dynamic> companies = responseData['company_data'];
+
+        setState(() {
+          companyDataList = companies.map((data) => CompanyData.fromJson(data)).toList();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Este usuário não tem empresas cadastradas.')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao obter empresas!')),
@@ -46,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Screen'),
+        title: Text('Suas Empresas'),
         backgroundColor: Colors.redAccent,
       ),
       body: Padding(
@@ -56,56 +69,33 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Filtro atual:',
+                  'Suas empresas',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 25,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Adicione a lógica para o botão de filtro aqui
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    padding: EdgeInsets.symmetric(horizontal: 80, vertical: 13),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    'Todos',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
                   ),
                 ),
               ],
             ),
             SizedBox(height: 20),
             Expanded(
-              child: ListView.builder(
+              child: companyDataList.isNotEmpty
+                  ? ListView.builder(
                 shrinkWrap: true,
                 itemCount: companyDataList.length,
                 itemBuilder: (context, index) {
                   return buildCompanyCard(companyDataList[index]);
                 },
-              ),
+              ) : Center(child: Text('Você não tem empresas cadastradas.'),),
             ),
             SizedBox(height: 20),
-            Center(  // Adicione o widget Center aqui
+            Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Redireciona para a tela CompanyScreen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CompanyScreen(userId: widget.userId),
-                    ),
-                  );
+                  // Adicione a lógica para o botão "Cadastrar empresa" aqui
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
@@ -115,9 +105,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 child: Text(
-                  'Minhas empresas',
+                  'Cadastrar empresa',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
                 ),
               ),
