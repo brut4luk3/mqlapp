@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 
 class CompanyDetails extends StatefulWidget {
@@ -12,12 +13,24 @@ class CompanyDetails extends StatefulWidget {
 }
 
 class _CompanyDetailsState extends State<CompanyDetails> {
-  late CompanyDetailsData? companyDetailsData;
+  late CompanyDetailsData companyDetailsData;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    companyDetailsData = CompanyDetailsData(
+      companyId: 0,
+      name: '',
+      description: '',
+      logo: '',
+      address: '',
+      email: '',
+      instagram: '',
+      phone: '',
+      segment: '',
+      userId: 0,
+    );
     fetchCompanyDetails();
   }
 
@@ -42,7 +55,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao obter detalhes da empresa')),
+        SnackBar(content: Text('Erro ao obter detalhes da empresa!')),
       );
     }
   }
@@ -51,41 +64,228 @@ class _CompanyDetailsState extends State<CompanyDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalhes da Empresa'),
+        title: Text('Detalhes de ${companyDetailsData.name}'),
+        backgroundColor: Colors.redAccent,
       ),
       body: isLoading
           ? Center(
         child: CircularProgressIndicator(),
       )
-          : buildCompanyDetailsBody(),
+          : SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/fundo.png',
+                  fit: BoxFit.cover,
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: 16),
+                    ClipOval(
+                      child: Image.memory(
+                        base64Decode(companyDetailsData.logo),
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      companyDetailsData.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center, // Centralizar o conteúdo
+                  children: [
+                    SizedBox(height: 8),
+                    Text(
+                      companyDetailsData.segment,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        _showDescriptionPopup(
+                          context,
+                          companyDetailsData.description,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white70,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Container(
+                        width: 270, // Largura desejada
+                        padding: EdgeInsets.symmetric(vertical: 20), // Ajuste o padding conforme necessário
+                        child: Center(
+                          child: Text(
+                            '${companyDetailsData.description.length > 50 ? '${companyDetailsData.description.substring(0, 50)}...Leia mais' : companyDetailsData.description}',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    _buildText('Instagram:', companyDetailsData.instagram),
+                    SizedBox(height: 10),
+                    _buildText('Telefone:', _formatPhoneNumber(companyDetailsData.phone)),
+                    SizedBox(height: 10),
+                    _buildText('E-mail de Contato:', companyDetailsData.email),
+                    SizedBox(height: 10),
+                    _buildText('Endereço:', companyDetailsData.address),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            String url = 'https://api.whatsapp.com/send?phone=${_formatPhoneNumberForWhatsApp(companyDetailsData.phone)}';
+                            Uri new_url = Uri.parse(url);
+                            _launchURL(new_url);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Whatsapp',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            String url = 'https://www.instagram.com/${companyDetailsData.instagram}';
+                            Uri new_url = Uri.parse(url);
+                            _launchURL(new_url);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Instagram',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget buildCompanyDetailsBody() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Nome: ${companyDetailsData!.name}',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+  Widget _buildText(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.redAccent,
           ),
-          SizedBox(height: 8),
-          Text('Descrição: ${companyDetailsData!.description}'),
-          SizedBox(height: 8),
-          Text('Endereço: ${companyDetailsData!.address}'),
-          SizedBox(height: 8),
-          Text('E-mail: ${companyDetailsData!.email}'),
-          SizedBox(height: 8),
-          Text('Instagram: ${companyDetailsData!.instagram}'),
-          SizedBox(height: 8),
-          Text('Telefone: ${companyDetailsData!.phone}'),
-          SizedBox(height: 8),
-          Text('Segmento: ${companyDetailsData!.segment}'),
-        ],
-      ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
+      ],
     );
+  }
+
+  void _showDescriptionPopup(BuildContext context, String description) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center( // Centralizar o título
+            child: Text('Descrição'),
+          ),
+          content: Text(description),
+          actions: [
+            Center( // Centralizar o botão de fechar
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Fechar'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatPhoneNumber(String phoneNumber) {
+    // Verifica se o telefone está no padrão (47)99999-9999
+    final RegExp regex = RegExp(r'^\(\d{2}\)\d{5}-\d{4}$');
+    if (!regex.hasMatch(phoneNumber)) {
+      // Se não estiver, tenta ajustar
+      phoneNumber = phoneNumber.replaceAll(RegExp(r'\D'), '');
+      if (phoneNumber.length == 11) {
+        phoneNumber = '(${phoneNumber.substring(0, 2)})${phoneNumber.substring(2, 7)}-${phoneNumber.substring(7)}';
+      }
+    }
+    return phoneNumber;
+  }
+
+  String _formatPhoneNumberForWhatsApp(String phoneNumber) {
+    // Remove caracteres não numéricos
+    final String formattedNumber = phoneNumber.replaceAll(RegExp(r'\D'), '');
+    return formattedNumber;
+  }
+
+  void _launchURL(Uri url) async {
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Não foi possível abrir o link: $url';
+    }
   }
 }
 
