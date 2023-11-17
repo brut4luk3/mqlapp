@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'company_details.dart';
+import 'register_company.dart';
 
 class CompanyScreen extends StatefulWidget {
   final int userId;
@@ -59,7 +60,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Suas Empresas'),
+        title: Text('Painel de controle'),
         backgroundColor: Colors.redAccent,
       ),
       body: Padding(
@@ -95,7 +96,13 @@ class _CompanyScreenState extends State<CompanyScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Adicione a lógica para o botão "Cadastrar empresa" aqui
+                  // Redireciona para a tela CompanyScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RegisterCompanyScreen(userId: widget.userId),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,

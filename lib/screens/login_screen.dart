@@ -11,6 +11,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool isPasswordVisible = false;
 
   Future<void> login() async {
     final String apiUrl = 'https://mqlapp.onrender.com/api/authentication';
@@ -65,8 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Image.asset(
                   'assets/images/logo2.png',
-                  width: 250, // Ajuste conforme necessário
-                  height: 250, // Ajuste conforme necessário
+                  width: 250,
+                  height: 250,
                 ),
                 SizedBox(height: 5),
                 TextField(
@@ -79,10 +80,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: 15),
                 TextField(
                   controller: passwordController,
-                  obscureText: true,
+                  obscureText: !isPasswordVisible,
                   decoration: InputDecoration(
                     labelText: 'Senha',
                     border: OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isPasswordVisible = !isPasswordVisible;
+                        });
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(height: 25),
