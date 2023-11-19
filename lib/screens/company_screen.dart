@@ -51,7 +51,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao obter empresas!')),
+        SnackBar(content: Text('Cadastre sua primeira empresa!')),
       );
     }
   }

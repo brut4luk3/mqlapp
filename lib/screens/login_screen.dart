@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'home_screen.dart';
+import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,8 +14,20 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+    return emailRegex.hasMatch(email);
+  }
+
   Future<void> login() async {
     final String apiUrl = 'https://mqlapp.onrender.com/api/authentication';
+
+    if (!_isValidEmail(emailController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('E-mail inválido!')),
+      );
+      return;
+    }
 
     final Map<String, String> data = {
       'email': emailController.text,
@@ -40,8 +53,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } else if (response.statusCode == 404) {
       Map<String, dynamic> errorData = jsonDecode(response.body);
+      String errorMessage = errorData['erro'] ?? 'Usuário não encontrado!';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorData['Usuário não encontrado!'])),
+        SnackBar(content: Text(errorMessage)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -54,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: Text('Inicie sua sessão'),
         backgroundColor: Colors.redAccent,
       ),
       body: SingleChildScrollView(
@@ -76,7 +90,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     labelText: 'E-mail',
                     border: OutlineInputBorder(),
                   ),
+                  maxLength: 50,
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (text) {
+                    setState(() {});
+                  },
                 ),
+                if (emailController.text.isNotEmpty && !_isValidEmail(emailController.text))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      'E-mail inválido',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
                 SizedBox(height: 15),
                 TextField(
                   controller: passwordController,
@@ -137,7 +164,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Adicione a lógica para "Cadastre-se" aqui
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SignUpScreen(),
+                      ),
+                    );
                   },
                   child: Text(
                     'Cadastre-se',

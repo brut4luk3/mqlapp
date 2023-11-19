@@ -24,6 +24,11 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   TextEditingController _addressController = TextEditingController();
   File? _selectedLogo;
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+    return emailRegex.hasMatch(email);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -64,7 +69,8 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Center(
-                      child: Text(_segments[index],)),
+                    child: Text(_segments[index]),
+                  ),
                   onTap: () {
                     setState(() {
                       _selectedSegment = _segments[index];
@@ -135,11 +141,12 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
         _phoneController.text.isEmpty ||
         _instagramController.text.isEmpty ||
         _emailController.text.isEmpty ||
+        !_isValidEmail(_emailController.text) ||
         _selectedSegment.isEmpty ||
         _selectedLogo == null ||
         _addressController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Preencha todos os campos!')),
+        SnackBar(content: Text('Preencha todos os campos corretamente!')),
       );
       return false;
     }
@@ -237,7 +244,19 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                   border: OutlineInputBorder(),
                 ),
                 maxLength: 50,
+                keyboardType: TextInputType.emailAddress,
+                onChanged: (text) {
+                  setState(() {});
+                },
               ),
+              if (_emailController.text.isNotEmpty && !_isValidEmail(_emailController.text))
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'E-mail inválido',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
               SizedBox(height: 20),
               TextField(
                 controller: _addressController,
