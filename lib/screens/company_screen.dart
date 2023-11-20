@@ -95,7 +95,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
             SizedBox(height: 20),
             // Exibe a animação de carregamento enquanto os dados estão sendo carregados
             _isLoading
-                ? CircularProgressIndicator()
+                ? Center(child: CircularProgressIndicator()) // Centraliza a animação de carregamento
                 : Expanded(
               child: companyDataList.isNotEmpty
                   ? ListView.builder(

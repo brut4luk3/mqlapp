@@ -1,32 +1,29 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'home_screen.dart';
-import 'signup_screen.dart';
-import 'reset_password.dart';
+import 'reset_password_confirm.dart';
 
-class LoginScreen extends StatefulWidget {
+class ResetPasswordScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  bool isPasswordVisible = false;
-  bool isLoading = false;
 
   bool _isValidEmail(String email) {
     final emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
     return emailRegex.hasMatch(email);
   }
 
-  Future<void> login() async {
+  bool isLoading = false;
+
+  Future<void> sendResetCode() async {
     setState(() {
       isLoading = true;
     });
 
-    final String apiUrl = 'https://mqlapp.onrender.com/api/authentication';
+    final String apiUrl = 'https://mqlapp.onrender.com/api/request_password_reset';
 
     if (!_isValidEmail(emailController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -42,7 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final Map<String, String> data = {
       'email': emailController.text,
-      'password': passwordController.text,
     };
 
     final http.Response response = await http.post(
@@ -52,19 +48,17 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> responseData = jsonDecode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Código de redefinição enviado com sucesso! Verifique seu e-mail.')),
+      );
+      // Redirecionar para a página reset_password_confirm
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(
-            fullName: responseData['full_name'],
-            userId: responseData['id'],
-          ),
-        ),
+        MaterialPageRoute(builder: (context) => ResetPasswordConfirmScreen()),
       );
     } else if (response.statusCode == 404) {
       Map<String, dynamic> errorData = jsonDecode(response.body);
-      String errorMessage = errorData['erro'] ?? 'Usuário não encontrado!';
+      String errorMessage = errorData['error'] ?? 'E-mail não encontrado na base de dados.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
@@ -83,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Inicie sua sessão'),
+        title: Text('Redefina sua senha'),
         backgroundColor: Colors.redAccent,
       ),
       body: Stack(
@@ -95,16 +89,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'assets/images/logo2.png',
-                      width: 250,
-                      height: 250,
+                    Text(
+                      'Insira seu e-mail de login',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
                     ),
-                    SizedBox(height: 5),
+                    SizedBox(height: 200),
                     TextField(
                       controller: emailController,
                       decoration: InputDecoration(
-                        labelText: 'E-mail',
+                        labelText: 'E-mail de login',
                         border: OutlineInputBorder(),
                       ),
                       maxLength: 50,
@@ -121,30 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
-                    SizedBox(height: 15),
-                    TextField(
-                      controller: passwordController,
-                      obscureText: !isPasswordVisible,
-                      decoration: InputDecoration(
-                        labelText: 'Senha',
-                        border: OutlineInputBorder(),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isPasswordVisible = !isPasswordVisible;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 25),
+                    SizedBox(height: 200),
                     ElevatedButton(
-                      onPressed: login,
+                      onPressed: sendResetCode,
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -156,39 +131,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 50,
                         child: Center(
                           child: Text(
-                            'Login',
+                            'Enviar',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () async {
-                        await _showResetPasswordScreen();
-                      },
-                      child: Text(
-                        'Esqueci minha senha',
-                        style: TextStyle(
-                          fontSize: 18,
-                          decoration: TextDecoration.none,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        await _showSignUpScreen();
-                      },
-                      child: Text(
-                        'Cadastre-se',
-                        style: TextStyle(
-                          fontSize: 18,
-                          decoration: TextDecoration.none,
-                          color: Colors.blue,
                         ),
                       ),
                     ),
@@ -205,24 +153,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  Future<void> _showResetPasswordScreen() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResetPasswordScreen(),
-      ),
-    );
-  }
-
-  Future<void> _showSignUpScreen() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SignUpScreen(),
       ),
     );
   }
