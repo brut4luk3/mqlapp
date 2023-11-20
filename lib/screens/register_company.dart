@@ -29,6 +29,8 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
     return emailRegex.hasMatch(email);
   }
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -67,16 +69,30 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
             child: ListView.builder(
               itemCount: _segments.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Center(
-                    child: Text(_segments[index]),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      _selectedSegment = _segments[index];
-                    });
-                    Navigator.pop(context);
-                  },
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_segments[index]),
+                            if (_selectedSegment == _segments[index])
+                              Icon(Icons.check, color: Colors.redAccent),
+                            if (_selectedSegment != _segments[index])
+                              Icon(Icons.radio_button_unchecked, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _selectedSegment = _segments[index];
+                        });
+                        Navigator.pop(context);
+                      },
+                    ),
+                    Divider(height: 1, color: Colors.grey),
+                  ],
                 );
               },
             ),
@@ -98,6 +114,10 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
 
   void _registerCompany() async {
     if (_validateInputs()) {
+      setState(() {
+        _isLoading = true;
+      });
+
       final bytes = _selectedLogo?.readAsBytesSync();
 
       final String apiUrl = 'https://mqlapp.onrender.com/api/register_company';
@@ -121,6 +141,10 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
         body: jsonEncode(data),
         headers: {'Content-Type': 'application/json'},
       );
+
+      setState(() {
+        _isLoading = false;
+      });
 
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -175,7 +199,11 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
         title: Text('Cadastre sua empresa'),
         backgroundColor: Colors.redAccent,
       ),
-      body: SingleChildScrollView(
+      body: _isLoading
+          ? Center(
+        child: CircularProgressIndicator(),
+      )
+          : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(

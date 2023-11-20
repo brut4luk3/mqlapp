@@ -16,6 +16,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<CompanyData> companyDataList = [];
+  String _selectedSegment = 'Todos'; // Inicializa com "Todos"
+  bool _isLoading = true; // Adiciona uma variável de estado para controlar o carregamento
 
   @override
   void initState() {
@@ -24,9 +26,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchCompanies() async {
-    final String apiUrl = 'https://mqlapp.onrender.com/api/get_companies';
+    // Define _isLoading como true no início do carregamento
+    setState(() {
+      _isLoading = true;
+    });
 
-    final http.Response response = await http.get(Uri.parse(apiUrl));
+    String apiUrl = 'https://mqlapp.onrender.com/api/get_companies_by_segment';
+
+    final Map<String, dynamic> data = {
+      'segment': _selectedSegment,
+    };
+
+    final http.Response response = await http.post(
+      Uri.parse(apiUrl),
+      body: jsonEncode(data),
+      headers: {'Content-Type': 'application/json'},
+    );
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -34,97 +49,114 @@ class _HomeScreenState extends State<HomeScreen> {
 
       setState(() {
         companyDataList = companies.map((data) => CompanyData.fromJson(data)).toList();
+        // Define _isLoading como false quando os dados são carregados
+        _isLoading = false;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao obter empresas!')),
+        SnackBar(content: Text('Não há empresas cadastradas neste segmento.')),
       );
+      // Define _isLoading como false em caso de erro
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Início'),
-        backgroundColor: Colors.redAccent,
+  void _selectSegment() async {
+    final List<String> _segments = [];
+
+    final String apiUrl = 'https://mqlapp.onrender.com/api/get_segments';
+
+    final http.Response response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final List<dynamic> segments = responseData['segments'];
+
+      setState(() {
+        _segments.addAll(segments.cast<String>());
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao obter segmentos!')),
+      );
+    }
+
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Filtro atual:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Adicione a lógica para o botão de filtro aqui
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    padding: EdgeInsets.symmetric(horizontal: 80, vertical: 13),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    'Todos',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: companyDataList.length,
-                itemBuilder: (context, index) {
-                  return buildCompanyCard(companyDataList[index]);
-                },
-              ),
-            ),
-            SizedBox(height: 20),
-            Center(  // Adicione o widget Center aqui
-              child: ElevatedButton(
-                onPressed: () {
-                  // Redireciona para a tela CompanyScreen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CompanyScreen(userId: widget.userId),
-                    ),
+      builder: (BuildContext context) {
+        return Container(
+          margin: EdgeInsets.all(20),
+          child: Center(
+            child: ListView.builder(
+              itemCount: _segments.length + 1, // Adiciona 1 para incluir a opção "Todos"
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  // Opção "Todos"
+                  return Column(
+                    children: [
+                      ListTile(
+                        title: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Todos'),
+                              if (_selectedSegment == 'Todos')
+                                Icon(Icons.check, color: Colors.redAccent),
+                              if (_selectedSegment != 'Todos')
+                                Icon(Icons.radio_button_unchecked, color: Colors.grey),
+                            ],
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _selectedSegment = 'Todos';
+                          });
+                          Navigator.pop(context);
+                          fetchCompanies(); // Atualiza a lista de empresas com a opção "Todos"
+                        },
+                      ),
+                      Divider(height: 1, color: Colors.grey),
+                    ],
                   );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  padding: EdgeInsets.symmetric(horizontal: 116, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Minhas empresas',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-              ),
+                } else {
+                  // Outras opções
+                  return Column(
+                    children: [
+                      ListTile(
+                        title: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(_segments[index - 1]), // Subtrai 1 para compensar a opção "Todos"
+                              if (_selectedSegment == _segments[index - 1])
+                                Icon(Icons.check, color: Colors.redAccent),
+                              if (_selectedSegment != _segments[index - 1])
+                                Icon(Icons.radio_button_unchecked, color: Colors.grey),
+                            ],
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _selectedSegment = _segments[index - 1];
+                          });
+                          Navigator.pop(context);
+                          fetchCompanies(); // Atualiza a lista de empresas com o novo segmento selecionado
+                        },
+                      ),
+                      Divider(height: 1, color: Colors.grey),
+                    ],
+                  );
+                }
+              },
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -185,6 +217,97 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Início'),
+        backgroundColor: Colors.redAccent,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Filtro atual:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: _selectSegment,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        _selectedSegment,
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            // Exibe a animação de carregamento enquanto os dados estão sendo carregados
+            _isLoading
+                ? CircularProgressIndicator()
+                : Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: companyDataList.length,
+                itemBuilder: (context, index) {
+                  return buildCompanyCard(companyDataList[index]);
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CompanyScreen(userId: widget.userId),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  padding: EdgeInsets.symmetric(horizontal: 116, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Minhas empresas',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
               ),
             ),
           ],

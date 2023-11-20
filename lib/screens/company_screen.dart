@@ -15,6 +15,7 @@ class CompanyScreen extends StatefulWidget {
 
 class _CompanyScreenState extends State<CompanyScreen> {
   List<CompanyData> companyDataList = [];
+  bool _isLoading = true; // Adiciona uma variável de estado para controlar o carregamento
 
   @override
   void initState() {
@@ -43,16 +44,26 @@ class _CompanyScreenState extends State<CompanyScreen> {
 
         setState(() {
           companyDataList = companies.map((data) => CompanyData.fromJson(data)).toList();
+          // Define _isLoading como false quando os dados são carregados
+          _isLoading = false;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Este usuário não tem empresas cadastradas.')),
         );
+        // Define _isLoading como false em caso de erro
+        setState(() {
+          _isLoading = false;
+        });
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Cadastre sua primeira empresa!')),
       );
+      // Define _isLoading como false em caso de erro
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -82,7 +93,10 @@ class _CompanyScreenState extends State<CompanyScreen> {
               ],
             ),
             SizedBox(height: 20),
-            Expanded(
+            // Exibe a animação de carregamento enquanto os dados estão sendo carregados
+            _isLoading
+                ? CircularProgressIndicator()
+                : Expanded(
               child: companyDataList.isNotEmpty
                   ? ListView.builder(
                 shrinkWrap: true,
@@ -90,7 +104,8 @@ class _CompanyScreenState extends State<CompanyScreen> {
                 itemBuilder: (context, index) {
                   return buildCompanyCard(companyDataList[index]);
                 },
-              ) : Center(child: Text('Você não tem empresas cadastradas.'),),
+              )
+                  : Center(child: Text('Você não tem empresas cadastradas.')),
             ),
             SizedBox(height: 20),
             Center(
