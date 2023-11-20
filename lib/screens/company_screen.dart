@@ -190,7 +190,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Veja mais detalhes',
+                    'Clique para editar ou excluir',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white70,
