@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
+import 'update_delete_company.dart';
 
-class CompanyDetails extends StatefulWidget {
+class UpdateCompany extends StatefulWidget {
   final int companyId;
 
-  CompanyDetails({required this.companyId});
+  UpdateCompany({required this.companyId});
 
   @override
-  _CompanyDetailsState createState() => _CompanyDetailsState();
+  _UpdateCompanyState createState() => _UpdateCompanyState();
 }
 
-class _CompanyDetailsState extends State<CompanyDetails> {
+class _UpdateCompanyState extends State<UpdateCompany> {
   late CompanyDetailsData companyDetailsData;
   bool isLoading = true;
 
@@ -64,8 +65,23 @@ class _CompanyDetailsState extends State<CompanyDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalhes da Empresa'),
+        title: Text('Clique no ícone para modificar'),
         backgroundColor: Colors.redAccent,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdateDeleteCompanyScreen(
+                    companyId: widget.companyId,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: isLoading
           ? Center(
@@ -110,7 +126,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center, // Centralizar o conteúdo
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 8),
                     Text(
@@ -136,8 +152,8 @@ class _CompanyDetailsState extends State<CompanyDetails> {
                         ),
                       ),
                       child: Container(
-                        width: 270, // Largura desejada
-                        padding: EdgeInsets.symmetric(vertical: 20), // Ajuste o padding conforme necessário
+                        width: 270,
+                        padding: EdgeInsets.symmetric(vertical: 20),
                         child: Center(
                           child: Text(
                             '${companyDetailsData.description.length > 50 ? '${companyDetailsData.description.substring(0, 50)}...Leia mais' : companyDetailsData.description}',
@@ -242,12 +258,12 @@ class _CompanyDetailsState extends State<CompanyDetails> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center( // Centralizar o título
+          title: Center(
             child: Text('Descrição'),
           ),
           content: Text(description),
           actions: [
-            Center( // Centralizar o botão de fechar
+            Center(
               child: TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -262,10 +278,8 @@ class _CompanyDetailsState extends State<CompanyDetails> {
   }
 
   String _formatPhoneNumber(String phoneNumber) {
-    // Verifica se o telefone está no padrão (47)99999-9999
     final RegExp regex = RegExp(r'^\(\d{2}\)\d{5}-\d{4}$');
     if (!regex.hasMatch(phoneNumber)) {
-      // Se não estiver, tenta ajustar
       phoneNumber = phoneNumber.replaceAll(RegExp(r'\D'), '');
       if (phoneNumber.length == 11) {
         phoneNumber = '(${phoneNumber.substring(0, 2)})${phoneNumber.substring(2, 7)}-${phoneNumber.substring(7)}';
@@ -275,7 +289,6 @@ class _CompanyDetailsState extends State<CompanyDetails> {
   }
 
   String _formatPhoneNumberForWhatsApp(String phoneNumber) {
-    // Remove caracteres não numéricos
     final String formattedNumber = phoneNumber.replaceAll(RegExp(r'\D'), '');
     return formattedNumber;
   }

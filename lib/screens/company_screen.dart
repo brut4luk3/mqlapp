@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mql/screens/update_company.dart';
 import 'dart:convert';
-import 'company_details.dart';
 import 'register_company.dart';
+
 
 class CompanyScreen extends StatefulWidget {
   final int userId;
@@ -146,7 +147,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CompanyDetails(
+            builder: (context) => UpdateCompany(
               companyId: companyData.companyId,
             ),
           ),
