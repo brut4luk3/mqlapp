@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'dart:typed_data';
-import 'company_screen.dart';
+import 'home_screen.dart';
 import 'dart:io';
 
 class UpdateDeleteCompanyScreen extends StatefulWidget {
@@ -218,7 +218,7 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
         );
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (BuildContext context) => CompanyScreen(userId: widget.userId),
+            builder: (BuildContext context) => HomeScreen(userId: widget.userId),
           ),
         );
       } else {

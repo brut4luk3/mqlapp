@@ -5,10 +5,10 @@ import 'company_details.dart';
 import 'company_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String fullName;
+  //final String fullName;
   final int userId;
 
-  HomeScreen({required this.fullName, required this.userId});
+  HomeScreen({required this.userId});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
