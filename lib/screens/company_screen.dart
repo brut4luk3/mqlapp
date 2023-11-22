@@ -149,6 +149,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
           MaterialPageRoute(
             builder: (context) => UpdateCompany(
               companyId: companyData.companyId,
+              userId: widget.userId
             ),
           ),
         );

@@ -6,8 +6,9 @@ import 'update_delete_company.dart';
 
 class UpdateCompany extends StatefulWidget {
   final int companyId;
+  final int userId;
 
-  UpdateCompany({required this.companyId});
+  UpdateCompany({required this.companyId, required this.userId});
 
   @override
   _UpdateCompanyState createState() => _UpdateCompanyState();
@@ -76,6 +77,7 @@ class _UpdateCompanyState extends State<UpdateCompany> {
                 MaterialPageRoute(
                   builder: (context) => UpdateDeleteCompanyScreen(
                     companyId: widget.companyId,
+                    userId: widget.userId
                   ),
                 ),
               );

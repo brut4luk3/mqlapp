@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'dart:typed_data';
-import 'update_company.dart';
+import 'company_screen.dart';
+import 'dart:io';
 
 class UpdateDeleteCompanyScreen extends StatefulWidget {
   final int companyId;
+  final int userId;
 
-  UpdateDeleteCompanyScreen({required this.companyId});
+  UpdateDeleteCompanyScreen({required this.companyId, required this.userId});
 
   @override
   _UpdateDeleteCompanyScreenState createState() =>
@@ -164,15 +166,12 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
 
     if (result != null && result.files.isNotEmpty) {
       try {
-        final List<int>? bytes = _selectedLogo?.bytes?.cast<int>().toList();
-        if (bytes != null) {
-          setState(() {
-            _selectedLogo = MemoryImage(Uint8List.fromList(result.files.single.bytes!));
-            key = UniqueKey(); // Atualize a chave para forçar a reconstrução
-          });
-        } else {
-          print('Erro ao converter bytes do arquivo: bytes é nulo');
-        }
+        final PlatformFile file = result.files.single;
+        final Uint8List newBytes = await File(file.path!).readAsBytes();
+        setState(() {
+          _selectedLogo = MemoryImage(newBytes);
+          key = UniqueKey(); // Atualize a chave para forçar a reconstrução
+        });
       } catch (e) {
         print('Erro ao converter bytes do arquivo: $e');
       }
@@ -219,7 +218,7 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
         );
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (BuildContext context) => UpdateCompany(companyId: widget.companyId),
+            builder: (BuildContext context) => CompanyScreen(userId: widget.userId),
           ),
         );
       } else {
@@ -297,15 +296,6 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
       return false;
     }
     return true;
-  }
-
-  Future<MemoryImage> _loadImage() async {
-    if (_selectedLogo == null) {
-      return MemoryImage(Uint8List(0)); // Retorna uma imagem vazia
-    }
-
-    // Lógica para carregar a imagem
-    return MemoryImage(Uint8List.fromList(_selectedLogo!.bytes as Uint8List));
   }
 
   @override

@@ -196,7 +196,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cadastre sua empresa'),
+        title: Text('Registre uma nova empresa'),
         backgroundColor: Colors.redAccent,
       ),
       body: _isLoading
@@ -296,7 +296,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
               ),
               SizedBox(height: 20),
               Center(
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   onPressed: _selectSegment,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
@@ -306,7 +306,8 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                     ),
                     minimumSize: Size(buttonWidth, 0),
                   ),
-                  child: Text(
+                  icon: Icon(Icons.arrow_drop_down),
+                  label: Text(
                     _selectedSegment.isEmpty ? 'Selecionar segmento' : _selectedSegment,
                     style: TextStyle(
                       fontSize: 18,
@@ -325,7 +326,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                   : Container(),
               SizedBox(height: 20),
               Center(
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   onPressed: _uploadLogo,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
@@ -335,7 +336,8 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                     ),
                     minimumSize: Size(buttonWidth, 0),
                   ),
-                  child: Text(
+                  icon: Icon(Icons.add_a_photo),
+                  label: Text(
                     'Selecionar logo',
                     style: TextStyle(
                       fontSize: 18,
