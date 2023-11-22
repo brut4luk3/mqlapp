@@ -242,12 +242,25 @@ class _CompanyDetailsState extends State<CompanyDetails> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center( // Centralizar o título
+          title: Center(
             child: Text('Descrição'),
           ),
-          content: Text(description),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(description),
+                  ),
+                ],
+              ),
+            ),
+          ),
           actions: [
-            Center( // Centralizar o botão de fechar
+            Center(
               child: TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();

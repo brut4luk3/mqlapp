@@ -242,7 +242,11 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Empresa deletada com sucesso!')),
         );
-        Navigator.pop(context); // Voltar para a tela anterior após excluir
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (BuildContext context) => HomeScreen(userId: widget.userId),
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao excluir empresa!')),
@@ -256,23 +260,41 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmação'),
-          content: Text(
-              'Esta ação irá excluir sua empresa permanentemente. Tem certeza que deseja continuar?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(
-                    true); // Retorna true se o usuário escolher "Sim"
-              },
-              child: Text('Sim'),
+          title: Center(child: Text('Confirmação')),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Esta ação irá excluir sua empresa permanentemente.\nTem certeza que deseja continuar?',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(
-                    false); // Retorna false se o usuário escolher "Não" ou fechar o diálogo
-              },
-              child: Text('Não'),
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text('Sim'),
+                ),
+                SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('Não'),
+                ),
+              ],
             ),
           ],
         );

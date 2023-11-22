@@ -263,7 +263,20 @@ class _UpdateCompanyState extends State<UpdateCompany> {
           title: Center(
             child: Text('Descrição'),
           ),
-          content: Text(description),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(description),
+                  ),
+                ],
+              ),
+            ),
+          ),
           actions: [
             Center(
               child: TextButton(

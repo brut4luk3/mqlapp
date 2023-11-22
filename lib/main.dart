@@ -1,18 +1,40 @@
 import 'package:flutter/material.dart';
-
-import 'screens/login_screen.dart'; // Certifique-se de substituir pelo caminho correto
+import 'package:http/http.dart' as http;
+import 'screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicialize o servidor ou realize as configurações necessárias aqui
-  await initializeServer();
+  // Verifique a saúde do servidor antes de iniciar o aplicativo
+  bool isServerHealthy = await checkServerHealth();
 
-  runApp(MyApp());
+  if (isServerHealthy) {
+    runApp(MyApp());
+  } else {
+    // Trate o caso em que o servidor não está saudável
+    print('O servidor não está saudável. O aplicativo não será iniciado.');
+  }
 }
 
-Future<void> initializeServer() async {
-  // Adicione aqui a lógica de inicialização do servidor, se necessário
+Future<bool> checkServerHealth() async {
+  final healthCheckUrl = Uri.parse('https://mqlapp.onrender.com/healthcheck');
+
+  try {
+    final response = await http.get(healthCheckUrl);
+
+    if (response.statusCode == 200) {
+      // O servidor está saudável
+      return true;
+    } else {
+      // O servidor não está saudável
+      print('Erro no health check: ${response.statusCode}');
+      return false;
+    }
+  } catch (e) {
+    // Ocorreu um erro ao fazer o health check
+    print('Erro ao fazer o health check: $e');
+    return false;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +45,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(), // Inicie com a tela de login
+      home: LoginScreen(),
     );
   }
 }

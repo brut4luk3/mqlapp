@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
+import 'home_screen.dart';
 
 class RegisterCompanyScreen extends StatefulWidget {
   final int userId;
@@ -151,6 +152,11 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
           SnackBar(content: Text('Empresa salva com sucesso!')),
         );
         _clearForm();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (BuildContext context) => HomeScreen(userId: widget.userId),
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao salvar empresa!')),
