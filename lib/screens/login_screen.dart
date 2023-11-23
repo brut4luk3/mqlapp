@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'home_screen.dart';
 import 'signup_screen.dart';
 import 'reset_password.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -15,10 +16,28 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
   bool isLoading = false;
+  bool keepMeLoggedIn = false;
 
   bool _isValidEmail(String email) {
     final emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
     return emailRegex.hasMatch(email);
+  }
+
+  void toggleKeepMeLoggedIn() {
+    setState(() {
+      keepMeLoggedIn = !keepMeLoggedIn;
+    });
+  }
+
+  Future<void> saveKeepMeLoggedInState(bool value, int userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('keepMeLoggedIn', value);
+    if (value) {
+      await prefs.setInt('userId', userId);
+    } else {
+      // Se o usuário desmarcar "Me mantenha conectado", você pode limpar o userId
+      await prefs.remove('userId');
+    }
   }
 
   Future<void> login() async {
@@ -53,6 +72,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (response.statusCode == 200) {
       Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      if (keepMeLoggedIn) {
+        await saveKeepMeLoggedInState(keepMeLoggedIn, responseData['id']);
+      }
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -62,7 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       );
-    } else if (response.statusCode == 404) {
+    }
+    else if (response.statusCode == 404) {
       Map<String, dynamic> errorData = jsonDecode(response.body);
       String errorMessage = errorData['erro'] ?? 'Usuário não encontrado!';
       ScaffoldMessenger.of(context).showSnackBar(
@@ -97,10 +122,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Image.asset(
                       'assets/images/logo2.png',
-                      width: 250,
-                      height: 250,
+                      width: 225,
+                      height: 225,
                     ),
-                    SizedBox(height: 5),
+                    SizedBox(height: 1),
                     TextField(
                       controller: emailController,
                       decoration: InputDecoration(
@@ -121,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
-                    SizedBox(height: 15),
+                    SizedBox(height: 10),
                     TextField(
                       controller: passwordController,
                       obscureText: !isPasswordVisible,
@@ -142,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 25),
+                    SizedBox(height: 15),
                     ElevatedButton(
                       onPressed: login,
                       style: ElevatedButton.styleFrom(
@@ -165,7 +190,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 1),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: keepMeLoggedIn,
+                          onChanged: (value) {
+                            toggleKeepMeLoggedIn();
+                          },
+                        ),
+                        Text('Me mantenha conectado'),
+                      ],
+                    ),
+                    SizedBox(height: 1),
                     TextButton(
                       onPressed: () async {
                         await _showResetPasswordScreen();

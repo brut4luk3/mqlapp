@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'screens/login_screen.dart';
+import 'screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Obtenha o estado salvo do checkbox
+  bool keepMeLoggedIn = await getKeepMeLoggedInState();
 
   // Verifique a saúde do servidor antes de iniciar o aplicativo
   bool isServerHealthy = await checkServerHealth();
 
   if (isServerHealthy) {
-    runApp(MyApp());
+    runApp(MyApp(keepMeLoggedIn: keepMeLoggedIn));
   } else {
     // Trate o caso em que o servidor não está saudável
     print('O servidor não está saudável. O aplicativo não será iniciado.');
@@ -37,7 +42,16 @@ Future<bool> checkServerHealth() async {
   }
 }
 
+Future<bool> getKeepMeLoggedInState() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('keepMeLoggedIn') ?? false;
+}
+
 class MyApp extends StatelessWidget {
+  final bool keepMeLoggedIn;
+
+  MyApp({required this.keepMeLoggedIn});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,7 +59,24 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(),
+      home: FutureBuilder<int>(
+        future: getUserId(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return keepMeLoggedIn
+                ? HomeScreen(userId: snapshot.data ?? 0)
+                : LoginScreen();
+          } else {
+            // Pode exibir um indicador de carregamento enquanto espera pelo resultado
+            return CircularProgressIndicator();
+          }
+        },
+      ),
     );
+  }
+
+  Future<int> getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('userId') ?? 0; // Ou outro valor padrão, se apropriado
   }
 }

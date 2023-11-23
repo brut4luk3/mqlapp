@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'company_details.dart';
 import 'company_screen.dart';
+import 'login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
-  //final String fullName;
   final int userId;
 
   HomeScreen({required this.userId});
@@ -16,8 +17,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<CompanyData> companyDataList = [];
-  String _selectedSegment = 'Todos'; // Inicializa com "Todos"
-  bool _isLoading = true; // Adiciona uma variável de estado para controlar o carregamento
+  String _selectedSegment = 'Todos';
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -26,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchCompanies() async {
-    // Define _isLoading como true no início do carregamento
     setState(() {
       _isLoading = true;
     });
@@ -49,14 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
       setState(() {
         companyDataList = companies.map((data) => CompanyData.fromJson(data)).toList();
-        // Define _isLoading como false quando os dados são carregados
         _isLoading = false;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Não há empresas cadastradas neste segmento.')),
       );
-      // Define _isLoading como false em caso de erro
       setState(() {
         _isLoading = false;
       });
@@ -93,10 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
           margin: EdgeInsets.all(20),
           child: Center(
             child: ListView.builder(
-              itemCount: _segments.length + 1, // Adiciona 1 para incluir a opção "Todos"
+              itemCount: _segments.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  // Opção "Todos"
                   return Column(
                     children: [
                       ListTile(
@@ -117,14 +114,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             _selectedSegment = 'Todos';
                           });
                           Navigator.pop(context);
-                          fetchCompanies(); // Atualiza a lista de empresas com a opção "Todos"
+                          fetchCompanies();
                         },
                       ),
                       Divider(height: 1, color: Colors.grey),
                     ],
                   );
                 } else {
-                  // Outras opções
                   return Column(
                     children: [
                       ListTile(
@@ -132,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(_segments[index - 1]), // Subtrai 1 para compensar a opção "Todos"
+                              Text(_segments[index - 1]),
                               if (_selectedSegment == _segments[index - 1])
                                 Icon(Icons.check, color: Colors.redAccent),
                               if (_selectedSegment != _segments[index - 1])
@@ -145,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             _selectedSegment = _segments[index - 1];
                           });
                           Navigator.pop(context);
-                          fetchCompanies(); // Atualiza a lista de empresas com o novo segmento selecionado
+                          fetchCompanies();
                         },
                       ),
                       Divider(height: 1, color: Colors.grey),
@@ -158,6 +154,65 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+  }
+
+  Future<void> _showLogoutConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Center(
+                child: Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text('Você irá encerrar sua sessão. \n\nDeseja continuar?'),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Não'),
+                  ),
+                  SizedBox(width: 16),
+                  TextButton(
+                    onPressed: () {
+                      _logout();
+                      Navigator.of(context).pop();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginScreen(),
+                        ),
+                      );
+                    },
+                    child: Text('Sim'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('keepMeLoggedIn', false);
+    // Adicione qualquer outra lógica de logout necessária
   }
 
   Widget buildCompanyCard(CompanyData companyData) {
@@ -231,6 +286,14 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Início'),
         backgroundColor: Colors.redAccent,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              _showLogoutConfirmationDialog();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -272,9 +335,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             SizedBox(height: 20),
-            // Exibe a animação de carregamento enquanto os dados estão sendo carregados
             _isLoading
-                ? Center(child: CircularProgressIndicator()) // Centraliza a animação de carregamento
+                ? Center(child: CircularProgressIndicator())
                 : Expanded(
               child: ListView.builder(
                 shrinkWrap: true,

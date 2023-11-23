@@ -269,7 +269,7 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Esta ação irá excluir sua empresa permanentemente.\nTem certeza que deseja continuar?',
+                      'Esta ação irá excluir sua empresa permanentemente.\n\nTem certeza que deseja continuar?',
                       textAlign: TextAlign.center,
                     ),
                   ),
