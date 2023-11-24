@@ -108,8 +108,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Inicie sua sessão'),
+        title: Text(
+            'Inicie sua sessão',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Stack(
         children: [
@@ -185,6 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
+                              color: Colors.white
                             ),
                           ),
                         ),

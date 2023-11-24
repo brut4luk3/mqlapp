@@ -262,6 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     companyData.description.length > 50
                         ? '${companyData.description.substring(0, 50)}...'
                         : companyData.description,
+                    style: TextStyle(color: Colors.white70),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -284,8 +285,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Início'),
+        title: Text(
+            'Início',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
@@ -326,9 +331,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         _selectedSegment,
                         style: TextStyle(
                           fontSize: 18,
+                          color: Colors.white,
                         ),
                       ),
-                      Icon(Icons.arrow_drop_down),
+                      Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      ),
                     ],
                   ),
                 ),
@@ -368,6 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Minhas empresas',
                   style: TextStyle(
                     fontSize: 18,
+                    color: Colors.white,
                   ),
                 ),
               ),

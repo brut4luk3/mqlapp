@@ -202,8 +202,12 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registre uma nova empresa'),
+        title: Text(
+            'Registre uma nova empresa',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: _isLoading
           ? Center(
@@ -312,11 +316,15 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                     ),
                     minimumSize: Size(buttonWidth, 0),
                   ),
-                  icon: Icon(Icons.arrow_drop_down),
+                  icon: Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.white
+                  ),
                   label: Text(
                     _selectedSegment.isEmpty ? 'Selecionar segmento' : _selectedSegment,
                     style: TextStyle(
                       fontSize: 18,
+                      color: Colors.white
                     ),
                   ),
                 ),
@@ -342,11 +350,15 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                     ),
                     minimumSize: Size(buttonWidth, 0),
                   ),
-                  icon: Icon(Icons.add_a_photo),
+                  icon: Icon(
+                      Icons.add_a_photo,
+                      color: Colors.white
+                  ),
                   label: Text(
                     'Selecionar logo',
                     style: TextStyle(
                       fontSize: 18,
+                      color: Colors.white
                     ),
                   ),
                 ),
@@ -367,6 +379,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                     'Salvar',
                     style: TextStyle(
                       fontSize: 18,
+                      color: Colors.white
                     ),
                   ),
                 ),

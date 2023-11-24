@@ -326,8 +326,12 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edite ou exclua a empresa'),
+        title: Text(
+            'Edite ou exclua a empresa',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: _isLoading
           ? Center(
@@ -355,7 +359,7 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
                       child: InkWell(
                         onTap: _uploadLogo,
                         child: Align(
-                          alignment: Alignment.bottomRight,
+                          alignment: Alignment.center,
                           child: Icon(
                             Icons.add_a_photo,
                             color: Colors.white,
@@ -382,12 +386,16 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.add_a_photo),
+                    Icon(
+                        Icons.add_a_photo,
+                        color: Colors.white,
+                    ),
                     SizedBox(width: 8),
                     Text(
                       'Atualizar logo',
                       style: TextStyle(
                         fontSize: 18,
+                        color: Colors.white
                       ),
                     ),
                   ],
@@ -413,9 +421,13 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
                           : _selectedSegment,
                       style: TextStyle(
                         fontSize: 18,
+                        color: Colors.white,
                       ),
                     ),
-                    Icon(Icons.arrow_drop_down),
+                    Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                    ),
                   ],
                 ),
               ),
@@ -521,6 +533,7 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
                       'Salvar',
                       style: TextStyle(
                         fontSize: 18,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -538,6 +551,7 @@ class _UpdateDeleteCompanyScreenState extends State<UpdateDeleteCompanyScreen> {
                       'Excluir',
                       style: TextStyle(
                         fontSize: 18,
+                        color: Colors.white,
                       ),
                     ),
                   ),

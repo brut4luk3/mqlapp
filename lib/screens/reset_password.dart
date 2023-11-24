@@ -77,8 +77,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Redefina sua senha'),
+        title: Text(
+            'Redefina sua senha',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Stack(
         children: [
@@ -135,6 +139,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
+                              color: Colors.white
                             ),
                           ),
                         ),

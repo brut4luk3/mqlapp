@@ -77,8 +77,12 @@ class _ResetPasswordConfirmScreenState extends State<ResetPasswordConfirmScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Confirme a redefinição de senha'),
+        title: Text(
+            'Confirme a redefinição de senha',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Stack(
         children: [
@@ -162,6 +166,7 @@ class _ResetPasswordConfirmScreenState extends State<ResetPasswordConfirmScreen>
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
+                              color: Colors.white
                             ),
                           ),
                         ),

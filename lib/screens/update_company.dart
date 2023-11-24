@@ -66,8 +66,12 @@ class _UpdateCompanyState extends State<UpdateCompany> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Clique no ícone para modificar'),
+        title: Text(
+            'Clique no ícone para modificar',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: Icon(Icons.edit),
@@ -196,6 +200,7 @@ class _UpdateCompanyState extends State<UpdateCompany> {
                             'Whatsapp',
                             style: TextStyle(
                               fontSize: 18,
+                              color: Colors.white
                             ),
                           ),
                         ),
@@ -217,6 +222,7 @@ class _UpdateCompanyState extends State<UpdateCompany> {
                             'Instagram',
                             style: TextStyle(
                               fontSize: 18,
+                              color: Colors.white
                             ),
                           ),
                         ),

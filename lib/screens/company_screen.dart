@@ -72,8 +72,12 @@ class _CompanyScreenState extends State<CompanyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Painel de controle'),
+        title: Text(
+            'Painel de controle',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -131,6 +135,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
                   'Cadastrar empresa',
                   style: TextStyle(
                     fontSize: 16,
+                    color: Colors.white
                   ),
                 ),
               ),
@@ -189,6 +194,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
                     companyData.description.length > 50
                         ? '${companyData.description.substring(0, 50)}...'
                         : companyData.description,
+                    style: TextStyle(color: Colors.white70),
                   ),
                   SizedBox(height: 8),
                   Text(

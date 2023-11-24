@@ -64,8 +64,12 @@ class _CompanyDetailsState extends State<CompanyDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalhes da Empresa'),
+        title: Text(
+            'Detalhes da Empresa',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: isLoading
           ? Center(
@@ -178,6 +182,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
                             'Whatsapp',
                             style: TextStyle(
                               fontSize: 18,
+                              color: Colors.white
                             ),
                           ),
                         ),
@@ -199,6 +204,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
                             'Instagram',
                             style: TextStyle(
                               fontSize: 18,
+                              color: Colors.white
                             ),
                           ),
                         ),

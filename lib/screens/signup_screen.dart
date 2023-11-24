@@ -74,8 +74,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cadastre sua conta'),
+        title: Text(
+            'Cadastre sua conta',
+            style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.redAccent,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -191,6 +195,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     'Cadastrar',
                     style: TextStyle(
                       fontSize: 18,
+                      color: Colors.white
                     ),
                   ),
                 ),
