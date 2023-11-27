@@ -7,16 +7,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Obtenha o estado salvo do checkbox
+  // Obtém o estado salvo do checkbox
   bool keepMeLoggedIn = await getKeepMeLoggedInState();
 
-  // Verifique a saúde do servidor antes de iniciar o aplicativo
+  // Verifica a saúde do servidor antes de iniciar o aplicativo
   bool isServerHealthy = await checkServerHealth();
 
   if (isServerHealthy) {
     runApp(MyApp(keepMeLoggedIn: keepMeLoggedIn));
   } else {
-    // Trate o caso em que o servidor não está saudável
+
     print('O servidor não está saudável. O aplicativo não será iniciado.');
   }
 }
@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
                 ? HomeScreen(userId: snapshot.data ?? 0)
                 : LoginScreen();
           } else {
-            // Pode exibir um indicador de carregamento enquanto espera pelo resultado
+
             return CircularProgressIndicator();
           }
         },
@@ -77,6 +77,6 @@ class MyApp extends StatelessWidget {
 
   Future<int> getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('userId') ?? 0; // Ou outro valor padrão, se apropriado
+    return prefs.getInt('userId') ?? 0;
   }
 }
