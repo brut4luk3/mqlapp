@@ -16,7 +16,7 @@ class RegisterCompanyScreen extends StatefulWidget {
 
 class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   final List<String> _segments = [];
-  String _selectedSegment = '';
+  List<String> _selectedSegments = [];
   TextEditingController _nameController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
@@ -31,6 +31,8 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   }
 
   bool _isLoading = false;
+
+  String _selectedSegmentsText = 'Selecionar segmento';
 
   @override
   void initState() {
@@ -57,6 +59,14 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
     }
   }
 
+  void _updateSelectedSegmentsText() {
+    setState(() {
+      _selectedSegmentsText = _selectedSegments.isEmpty
+          ? 'Selecionar segmento'
+          : _selectedSegments.join(', ');
+    });
+  }
+
   void _selectSegment() {
     showModalBottomSheet(
       context: context,
@@ -64,40 +74,62 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
       builder: (BuildContext context) {
-        return Container(
-          margin: EdgeInsets.all(20),
-          child: Center(
-            child: ListView.builder(
-              itemCount: _segments.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      title: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(_segments[index]),
-                            if (_selectedSegment == _segments[index])
-                              Icon(Icons.check, color: Colors.redAccent),
-                            if (_selectedSegment != _segments[index])
-                              Icon(Icons.radio_button_unchecked, color: Colors.grey),
-                          ],
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              margin: EdgeInsets.all(20),
+              child: Center(
+                child: ListView.builder(
+                  itemCount: _segments.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(_segments[index]),
+                                if (_selectedSegments.contains(_segments[index]))
+                                  IconButton(
+                                    icon: Icon(Icons.check, color: Colors.redAccent),
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedSegments.remove(_segments[index]);
+                                        _updateSelectedSegmentsText();
+                                      });
+                                    },
+                                  )
+                                else
+                                  IconButton(
+                                    icon: Icon(Icons.radio_button_unchecked, color: Colors.grey),
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedSegments.add(_segments[index]);
+                                        _updateSelectedSegmentsText();
+                                      });
+                                    },
+                                  ),
+                              ],
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _selectedSegments.contains(_segments[index])
+                                  ? _selectedSegments.remove(_segments[index])
+                                  : _selectedSegments.add(_segments[index]);
+                              _updateSelectedSegmentsText();
+                            });
+                          },
                         ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _selectedSegment = _segments[index];
-                        });
-                        Navigator.pop(context);
-                      },
-                    ),
-                    Divider(height: 1, color: Colors.grey),
-                  ],
-                );
-              },
-            ),
-          ),
+                        Divider(height: 1, color: Colors.grey),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -132,7 +164,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
             : '@${_instagramController.text}',
         'phone': _phoneController.text,
         'email': _emailController.text,
-        'selected_segment': _selectedSegment,
+        'selected_segments': _selectedSegments,
         'image_base64': base64Encode(bytes!),
         'address': _addressController.text,
       };
@@ -172,7 +204,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
         _instagramController.text.isEmpty ||
         _emailController.text.isEmpty ||
         !_isValidEmail(_emailController.text) ||
-        _selectedSegment.isEmpty ||
+        _selectedSegments.isEmpty ||
         _selectedLogo == null ||
         _addressController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -190,7 +222,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
       _phoneController.text = '';
       _instagramController.text = '';
       _emailController.text = '';
-      _selectedSegment = '';
+      _selectedSegments = [];
       _selectedLogo = null;
       _addressController.text = '';
     });
@@ -198,13 +230,13 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double buttonWidth = MediaQuery.of(context).size.width * 0.9; // Ajuste o valor conforme necessário
+    double buttonWidth = MediaQuery.of(context).size.width * 0.9;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Registre uma nova empresa',
-            style: TextStyle(color: Colors.white),
+          'Registre uma nova empresa',
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.redAccent,
         iconTheme: IconThemeData(color: Colors.white),
@@ -305,27 +337,20 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                 maxLength: 50,
               ),
               SizedBox(height: 20),
-              Center(
-                child: ElevatedButton.icon(
-                  onPressed: _selectSegment,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              GestureDetector(
+                onTap: _selectSegment,
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: TextEditingController(
+                      text: _selectedSegments.isEmpty
+                          ? 'Selecionar segmento'
+                          : _selectedSegments.join(', '),
                     ),
-                    minimumSize: Size(buttonWidth, 0),
-                  ),
-                  icon: Icon(
-                      Icons.arrow_drop_down,
-                      color: Colors.white
-                  ),
-                  label: Text(
-                    _selectedSegment.isEmpty ? 'Selecionar segmento' : _selectedSegment,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white
+                    decoration: InputDecoration(
+                      labelText: 'Segmentos',
+                      border: OutlineInputBorder(),
                     ),
+                    maxLines: null,
                   ),
                 ),
               ),
@@ -350,16 +375,10 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                     ),
                     minimumSize: Size(buttonWidth, 0),
                   ),
-                  icon: Icon(
-                      Icons.add_a_photo,
-                      color: Colors.white
-                  ),
+                  icon: Icon(Icons.add_a_photo, color: Colors.white),
                   label: Text(
                     'Selecionar logo',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white
-                    ),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ),
@@ -377,10 +396,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                   ),
                   child: Text(
                     'Salvar',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white
-                    ),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ),
