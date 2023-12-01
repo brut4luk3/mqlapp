@@ -65,8 +65,8 @@ class _CompanyDetailsState extends State<CompanyDetails> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Detalhes da Empresa',
-            style: TextStyle(color: Colors.white),
+          'Detalhes da Empresa',
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.redAccent,
         iconTheme: IconThemeData(color: Colors.white),
@@ -114,17 +114,10 @@ class _CompanyDetailsState extends State<CompanyDetails> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center, // Centralizar o conteúdo
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 8),
-                    Text(
-                      companyDetailsData.segment,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
-                        color: Colors.redAccent,
-                      ),
-                    ),
+                    _buildSegmentLabel(companyDetailsData.segment),
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
@@ -140,8 +133,8 @@ class _CompanyDetailsState extends State<CompanyDetails> {
                         ),
                       ),
                       child: Container(
-                        width: 270, // Largura desejada
-                        padding: EdgeInsets.symmetric(vertical: 20), // Ajuste o padding conforme necessário
+                        width: 270,
+                        padding: EdgeInsets.symmetric(vertical: 20),
                         child: Center(
                           child: Text(
                             '${companyDetailsData.description.length > 50 ? '${companyDetailsData.description.substring(0, 50)}...Leia mais' : companyDetailsData.description}',
@@ -181,8 +174,8 @@ class _CompanyDetailsState extends State<CompanyDetails> {
                           child: Text(
                             'Whatsapp',
                             style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white
+                                fontSize: 18,
+                                color: Colors.white
                             ),
                           ),
                         ),
@@ -203,8 +196,8 @@ class _CompanyDetailsState extends State<CompanyDetails> {
                           child: Text(
                             'Instagram',
                             style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white
+                                fontSize: 18,
+                                color: Colors.white
                             ),
                           ),
                         ),
@@ -217,6 +210,20 @@ class _CompanyDetailsState extends State<CompanyDetails> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSegmentLabel(String segment) {
+    // Remove chaves e separa as palavras
+    List<String> segmentWords = segment.replaceAll('{', '').replaceAll('}', '').split(',');
+
+    return Text(
+      segmentWords.join(', '),
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 17,
+        color: Colors.redAccent,
       ),
     );
   }

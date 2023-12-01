@@ -67,8 +67,8 @@ class _UpdateCompanyState extends State<UpdateCompany> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Clique no ícone para modificar',
-            style: TextStyle(color: Colors.white),
+          'Clique no ícone para modificar',
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.redAccent,
         iconTheme: IconThemeData(color: Colors.white),
@@ -81,7 +81,7 @@ class _UpdateCompanyState extends State<UpdateCompany> {
                 MaterialPageRoute(
                   builder: (context) => UpdateDeleteCompanyScreen(
                     companyId: widget.companyId,
-                    userId: widget.userId
+                    userId: widget.userId,
                   ),
                 ),
               );
@@ -135,14 +135,7 @@ class _UpdateCompanyState extends State<UpdateCompany> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: 8),
-                    Text(
-                      companyDetailsData.segment,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
-                        color: Colors.redAccent,
-                      ),
-                    ),
+                    _buildSegmentLabel(companyDetailsData.segment),
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
@@ -200,7 +193,7 @@ class _UpdateCompanyState extends State<UpdateCompany> {
                             'Whatsapp',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.white
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -222,7 +215,7 @@ class _UpdateCompanyState extends State<UpdateCompany> {
                             'Instagram',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.white
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -235,6 +228,19 @@ class _UpdateCompanyState extends State<UpdateCompany> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSegmentLabel(String segment) {
+    List<String> segmentWords = segment.replaceAll('{', '').replaceAll('}', '').split(',');
+
+    return Text(
+      segmentWords.join(', '),
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 17,
+        color: Colors.redAccent,
       ),
     );
   }

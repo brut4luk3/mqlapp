@@ -394,20 +394,24 @@ class CompanyData {
   final String name;
   final String description;
   final String logo;
+  final List<String> segments;
 
   CompanyData({
     required this.companyId,
     required this.name,
     required this.description,
     required this.logo,
+    required this.segments,
   });
 
   factory CompanyData.fromJson(Map<String, dynamic> json) {
+    List<String> segments = (json['segment'] as String).replaceAll('{', '').replaceAll('}', '').split(',');
     return CompanyData(
       companyId: json['company_id'],
       name: json['name'],
       description: json['description'],
       logo: json['logo'],
+      segments: segments,
     );
   }
 }
