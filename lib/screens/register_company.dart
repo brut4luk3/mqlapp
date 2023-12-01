@@ -164,7 +164,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
             : '@${_instagramController.text}',
         'phone': _phoneController.text,
         'email': _emailController.text,
-        'selected_segments': _selectedSegments,
+        'selected_segment': _selectedSegments,
         'image_base64': base64Encode(bytes!),
         'address': _addressController.text,
       };
